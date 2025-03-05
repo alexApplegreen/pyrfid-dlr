@@ -9,6 +9,7 @@ All rights reserved.
 """
 
 import serial
+import os
 import struct
 
 class PyRfid(object):
@@ -22,14 +23,22 @@ class PyRfid(object):
     __rawTag = None
 
     def __init__(self, port = '/dev/ttyUSB0', baudRate = 9600):
-        """
-        Constructor for creating a PyRfid instance.
+        # type: (...) -> None
+        """Constructor for creating a PyRfid instance.
 
         Arguments:
             port (str): The port to use
-            baudRate (int): The baud-rate to use
+            baudRate (int): The baud-rate to use. Must be a multiple of 9600!
+            address (int): The sensor address
+            password (int): The sensor password
+
         """
 
+        ## Validates port
+        if ( os.path.exists(port) == False ):
+            raise Exception('The RFID sensor port "' + port + '" was not found!')
+
+        ## Initializes connection
         self.__serial = serial.Serial(port = port, baudrate = baudRate, bytesize = serial.EIGHTBITS, timeout = 1)
 
     def __del__(self):
@@ -48,9 +57,6 @@ class PyRfid(object):
 
         Returns:
             True if successful or False otherwise.
-
-        Raises:
-            Exception: if any error occurs
         """
 
         self.__rawTag = None
@@ -72,7 +78,7 @@ class PyRfid(object):
                     receivedFragment = struct.unpack('@B', receivedFragment)[0]
                 else:
                     rawTag += str(struct.unpack('@B', receivedFragment)[0])
-                    receivedFragment = int(receivedFragment, 16)
+                    receivedFragment = struct.unpack('@B', receivedFragment)[0]
 
                 ## Collects RFID data (hexadecimal)
                 receivedPacketData.append(receivedFragment)
@@ -112,9 +118,6 @@ class PyRfid(object):
 
         Returns:
             True if successful or False otherwise.
-
-        Raises:
-            Exception: if any error occurs
         """
 
         try:
