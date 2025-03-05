@@ -77,8 +77,8 @@ class PyRfid(object):
                 if ( ( index == 0 ) or ( index == 13 ) ):
                     receivedFragment = struct.unpack('@B', receivedFragment)[0]
                 else:
-                    rawTag += str(struct.unpack('@B', receivedFragment)[0])
-                    receivedFragment = struct.unpack('@B', receivedFragment)[0]
+                    rawTag += str(int(receivedFragment, 16))
+                    receivedFragment = int(receivedFragment, 16)
 
                 ## Collects RFID data (hexadecimal)
                 receivedPacketData.append(receivedFragment)
